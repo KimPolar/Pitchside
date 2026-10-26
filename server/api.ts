@@ -27,7 +27,7 @@ export function createApp(db:DatabaseSync) {
     leagues:list(`${leagueSelect} ORDER BY match_count+video_count DESC`),
     counts:db.prepare('SELECT (SELECT count(*) FROM matches) matches,(SELECT count(*) FROM videos) videos,(SELECT count(*) FROM teams) teams').get(),
     runs:list('SELECT * FROM source_runs ORDER BY id DESC LIMIT 8')
-   } satisfies Partial<HomeData>);
+   });
  });
  app.get('/api/leagues',(_req,res)=>res.json(list(leagueSelect)));
  app.get('/api/leagues/:id',(req,res)=>{const item=db.prepare(`${leagueSelect} WHERE l.id=?`).get(req.params.id);if(!item){res.status(404).json({message:'리그를 찾을 수 없어요'});return;}res.json(item);});
@@ -51,10 +51,10 @@ export function createApp(db:DatabaseSync) {
    paginate(req,res,matchSelect,clauses,params,req.query.order==='asc'?'m.date ASC,m.kickoff ASC':'m.date DESC,m.kickoff DESC');
  });
  app.get('/api/matches/:id',(req,res)=>{
-   const item=db.prepare(`${matchSelect} WHERE m.id=?`).get(req.params.id) as unknown as Match&{lineups_json:string;events_json:string};
+   const item=db.prepare(`${matchSelect} WHERE m.id=?`).get(req.params.id) as unknown as Match&{lineups_json:string;events_json:string;detail_message:string};
    if(!item){res.status(404).json({message:'경기를 찾을 수 없어요'});return;}
    const {lineups_json,events_json,...rest}=item;
-   res.json({...rest,lineups:JSON.parse(lineups_json),events:JSON.parse(events_json),videos:list(`${videoSelect} WHERE v.match_id=? ORDER BY v.published_at DESC`,[item.id])} as MatchDetail);
+   res.json({...rest,lineups:JSON.parse(lineups_json),events:JSON.parse(events_json),videos:list(`${videoSelect} WHERE v.match_id=? ORDER BY v.published_at DESC`,[item.id])});
  });
  app.get('/api/videos',(req,res)=>{
    const {clauses,params}=filters(req,{league:'v.league_id',kind:'v.kind',match:'v.match_id'});

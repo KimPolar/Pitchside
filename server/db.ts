@@ -26,6 +26,9 @@ export function transaction<T>(db: DatabaseSync, work:()=>T):T {
 const tables = new Set(['competitions','teams','players','matches','standings','player_stats','videos','aliases']);
 export function upsert(db: DatabaseSync, table:string, row:Record<string, string | number | null>) {
   if(!tables.has(table) || Object.keys(row).some(k=>!/^[a-z_]+$/.test(k))) throw new Error('저장 형식을 확인해 주세요');
+  const existing=db.prepare(`SELECT * FROM ${table} WHERE id=?`).get(row.id);
+  if(existing?.manual_locked)return {changes:0,lastInsertRowid:0};
+  if(existing)row={...existing,...row} as Record<string,string|number|null>;
   const keys=Object.keys(row);
   const edits=keys.filter(k=>k!=='id').map(k=>`${k}=excluded.${k}`).join(',');
   return db.prepare(`INSERT INTO ${table} (${keys.join(',')}) VALUES (${keys.map(()=>'?').join(',')}) ON CONFLICT(id) DO UPDATE SET ${edits} WHERE ${table}.manual_locked=0`).run(...keys.map(k=>row[k]));
