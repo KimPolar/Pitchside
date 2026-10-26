@@ -1,0 +1,89 @@
+/* search-suggest — 입력에 따라 제안 목록이 떠오른다.
+ * 커스터마이즈: --suggest-radius, --suggest-bg, --suggest-border, --suggest-active-bg, --suggest-duration.
+ * 기본값은 --_ 내부 변수의 폴백으로 둔다 — 요소 자신에 선언하면 조상 설정이 상속되지 못한다. */
+
+.suggest-root {
+  --_duration: var(--suggest-duration, 160ms);
+  --_ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.suggest-input {
+  width: 100%;
+  border: 1px solid var(--suggest-border, #d1d5db);
+  border-radius: var(--suggest-radius, 10px);
+  padding: 0.75rem 1rem;
+  background: var(--suggest-bg, #fff);
+  color: var(--suggest-color, #111827);
+  font: inherit;
+}
+
+.suggest-input:focus {
+  outline: none;
+  border-color: var(--suggest-accent, #1c1c1c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--suggest-accent, #1c1c1c) 22%, transparent);
+}
+
+/* 패널은 입력창 바로 아래에서 짧게 내려온다 — 위에서 내려오는 방향이 "입력에서 나온 것"으로 읽힌다.
+ * transform-origin을 위쪽에 두는 이유도 같다(중앙에서 커지면 어디서 나왔는지 알 수 없다) */
+.suggest-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  max-height: var(--suggest-max-height, 18rem);
+  overflow-y: auto;
+  border: 1px solid var(--suggest-border, #d1d5db);
+  border-radius: var(--suggest-radius, 10px);
+  background: var(--suggest-bg, #fff);
+  box-shadow: var(--suggest-shadow, 0 12px 28px rgb(0 0 0 / 0.14));
+  transform-origin: top center;
+  animation: suggest-drop var(--_duration) var(--_ease-out);
+}
+
+.suggest-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  color: var(--suggest-color, #111827);
+  cursor: pointer;
+}
+
+/* 마우스 hover와 키보드 이동이 같은 표시를 쓴다 — 지금 무엇이 선택될지가 한 가지로만 보인다 */
+.suggest-option[data-active='true'] {
+  background: var(--suggest-active-bg, #f3f3f3);
+}
+
+/* 검색어와 일치하는 부분 — <mark>의 기본 노랑 배경을 지우고 굵기로만 구분한다 */
+.suggest-option mark {
+  background: none;
+  color: inherit;
+  font-weight: 700;
+}
+
+.suggest-message {
+  padding: 0.75rem;
+  color: var(--suggest-dim, #6b7280);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@keyframes suggest-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.96);
+  }
+}
+
+/* 모션 민감 사용자: 패널이 내려오는 연출만 없앤다(목록은 그대로 나타난다) */
+@media (prefers-reduced-motion: reduce) {
+  .suggest-panel {
+    animation: none;
+  }
+}

@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.0.0" },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "concurrently -k -n server,web \"tsx watch server/index.ts\" \"vite --host 127.0.0.1\"",
     "build": "tsc --noEmit && vite build",
     "start": "tsx server/index.ts",
     "typecheck": "tsc --noEmit",
+    "format": "prettier --write src server shared tests docs README.md package.json tsconfig.json vite.config.ts index.html",
+    "format:check": "prettier --check src server shared tests docs README.md package.json tsconfig.json vite.config.ts index.html",
     "test": "tsx --test tests/*.test.ts",
     "db:init": "tsx server/cli.ts db:init",
     "db:backup": "tsx server/cli.ts db:backup",
@@ -35,6 +39,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^9.2.0",
+    "prettier": "^3.9.10",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
     "vite": "^7.1.0"

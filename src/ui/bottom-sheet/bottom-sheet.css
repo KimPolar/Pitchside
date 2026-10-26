@@ -1,0 +1,68 @@
+/* bottom-sheet — 아래에서 올라오는 시트 + 드래그 닫기.
+ * 커스터마이즈: --sheet-duration, --sheet-radius, --sheet-bg, --sheet-max-height.
+ * 기본값은 --_ 내부 변수의 폴백으로 둔다 — 요소 자신에 선언하면 조상 설정이 상속되지 못한다.
+ * 시트는 언마운트하지 않고 data-open으로만 여닫는다 — 닫힘 애니메이션이 공짜가 된다. */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--sheet-duration, 350ms) ease;
+  z-index: 40;
+}
+
+.sheet-backdrop[data-open='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-sheet {
+  --_duration: var(--sheet-duration, 350ms);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: var(--sheet-max-height, 85dvh);
+  overflow-y: auto;
+  background: var(--sheet-bg, #fff);
+  border-radius: var(--sheet-radius, 20px) var(--sheet-radius, 20px) 0 0;
+  transform: translateY(100%);
+  /* 드로어 전용 커브 — 빠르게 나와서 부드럽게 정착한다 */
+  transition: transform var(--_duration) cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 41;
+  /* 세로 드래그를 시트가 가져간다 — 없으면 모바일에서 페이지 스크롤과 싸운다 */
+  touch-action: none;
+}
+
+.bottom-sheet[data-open='true'] {
+  transform: translateY(0);
+}
+
+/* 드래그 핸들 — 잡을 수 있다는 힌트이자 터치 타깃 */
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.4);
+  margin: 8px auto;
+}
+
+/* 모션 민감 사용자: 이동을 끄고 페이드로 완화한다 */
+@media (prefers-reduced-motion: reduce) {
+  .bottom-sheet {
+    transform: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 150ms linear,
+      visibility 0s 150ms;
+  }
+  .bottom-sheet[data-open='true'] {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 150ms linear;
+  }
+}

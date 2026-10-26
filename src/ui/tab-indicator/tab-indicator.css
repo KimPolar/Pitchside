@@ -1,0 +1,29 @@
+/* tab-indicator — 활성 탭 밑줄이 미끄러져 이동하는 인디케이터.
+ * 커스터마이즈: --tab-indicator-color, --tab-indicator-height, --tab-indicator-duration.
+ * 기본값은 --_ 내부 변수의 폴백으로 둔다 — 요소 자신에 선언하면 조상 설정이 상속되지 못한다. */
+
+.tab-bar {
+  position: relative; /* 인디케이터의 offsetParent — 탭들과 같은 좌표계를 만든다 */
+  display: flex;
+}
+
+.tab-indicator {
+  --_height: var(--tab-indicator-height, 2px);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* 폭 1px을 scaleX로 늘린다 — width 애니메이션은 매 프레임 레이아웃을 돌리지만 transform은 GPU 합성만 쓴다 */
+  width: 1px;
+  height: var(--_height);
+  background: var(--tab-indicator-color, currentColor);
+  transform-origin: left;
+  transition: transform var(--tab-indicator-duration, 250ms) cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* 모션 민감 사용자: 슬라이드(이동)를 끄고 위치 표시는 즉시 점프로 유지한다 */
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator {
+    transition: none;
+  }
+}
