@@ -1,0 +1,8 @@
+node_modules/
+dist/
+data/*.sqlite*
+data/backups/
+data/raw/
+artifacts/
+.env
+*.log

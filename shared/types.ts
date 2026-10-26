@@ -1,0 +1,16 @@
+export type Availability = 'available' | 'partial' | 'unavailable' | 'requires_login' | 'failed' | 'not_collected';
+export interface Provenance { source: string; source_url: string; updated_at: string; manual_locked: number }
+export interface League { id: string; name: string; short_name: string; gender: string; age: string; category: string; description: string; match_count: number; video_count: number }
+export interface Competition extends Provenance { id: string; league_id: string; name: string; season: number; region: string; format: 'league' | 'tournament'; availability: Availability }
+export interface Team extends Provenance { id: string; name: string; league_id: string; emblem: string | null }
+export interface Match extends Provenance { id: string; competition_id: string; league_id: string; league_name: string; competition_name: string; season: number; region: string; home_id: string; away_id: string; home_name: string; away_name: string; home_emblem: string | null; away_emblem: string | null; kickoff: string | null; date: string; round: string; stage: string; venue: string; home_score: number | null; away_score: number | null; status: string; detail_status: Availability; video_count: number }
+export interface Video extends Provenance { id: string; title: string; channel: string; channel_id: string; thumbnail: string; published_at: string; kind: string; league_id: string | null; league_name: string | null; match_id: string | null; team_names: string; description: string; availability: Availability }
+export interface Standing extends Provenance { id: string; competition_id: string; team_id: string; team_name: string; emblem: string | null; position: number; played: number | null; wins: number | null; draws: number | null; losses: number | null; goals_for: number | null; goals_against: number | null; goal_difference: number | null; points: number | null }
+export interface PlayerStat extends Provenance { id: string; competition_id: string; player_id: string; player_name: string; team_name: string; position: string; photo: string | null; played: number | null; minutes: number | null; goals: number | null; assists: number | null; shots: number | null; yellow_cards: number | null; red_cards: number | null }
+export interface Lineup { team_id: string; player_name: string; number: string; position: string; starter: boolean; minutes: number | null; goals: number | null; yellow_cards: number | null; red_cards: number | null }
+export interface MatchEvent { minute: string; type: string; player_name: string; team_id: string; detail: string }
+export interface MatchDetail extends Match { videos: Video[]; lineups: Lineup[]; events: MatchEvent[]; detail_message: string }
+export interface SourceRun { id: number; source: string; status: string; started_at: string; finished_at: string | null; count: number; message: string }
+export interface Page<T> { items: T[]; total: number; page: number; page_size: number }
+export interface HomeData { featured: Video | null; videos: Video[]; upcoming: Match[]; recent: Match[]; standings: Standing[]; leagues: League[]; counts: { matches: number; videos: number; teams: number }; runs: SourceRun[] }
+export interface Suggestion { id: string; name: string; type: 'league' | 'team' | 'video'; url: string }
